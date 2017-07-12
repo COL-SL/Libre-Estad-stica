@@ -16,8 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 '''
-
+import pygtk
+pygtk.require('2.0')
 import gtk
+from shutil import copyfile
 
 
 class PyApp(gtk.Window):
@@ -39,6 +41,7 @@ class PyApp(gtk.Window):
         importm = gtk.MenuItem("Import")
         importm.set_submenu(imenu)
         inews = gtk.MenuItem("Importar fichero cvs...")
+        inews.connect("activate", self.importar_fichero_cvs, None)
         ibookmarks = gtk.MenuItem("Import bookmarks...")
         imail = gtk.MenuItem("Import mail...")
         imenu.append(inews)
@@ -51,12 +54,22 @@ class PyApp(gtk.Window):
         toolmenu = gtk.Menu()
         toolm = gtk.MenuItem("Herramientas")
         toolm.set_submenu(toolmenu)
-        mediam = gtk.MenuItem(u"Media Aritmética")
-        mediam.connect("activate", self.media_aritmetica, None)
-        desviacionm = gtk.MenuItem(u"Desviación Típica")
-        desviacionm.connect("activate", self.desviacion_tipica, None)
+
+        imenu_two = gtk.Menu()
+        mediam = gtk.MenuItem(u"Medidas Tendencia Central")
+        mediam.set_submenu(imenu_two)
+        mediam_sub = gtk.MenuItem(u"Media aritmética")
+        mediam_sub.connect("activate", self.media_aritmetica, None)
+
+        imenu_three = gtk.Menu()
+        dispersionm = gtk.MenuItem(u"Medidas Dispersión")
+        dispersionm.set_submenu(imenu_three)
+        dispersionm_sub = gtk.MenuItem(u"Rango")
+        dispersionm_sub.connect("activate", self.rango, None)
+        imenu_three.append(dispersionm_sub)
+        imenu_two.append(mediam_sub)
         toolmenu.append(mediam)
-        toolmenu.append(desviacionm)
+        toolmenu.append(dispersionm)
         mb.append(toolm)
 
         exit = gtk.MenuItem("Exit")
@@ -74,8 +87,41 @@ class PyApp(gtk.Window):
     def media_aritmetica(self, widget, data=None):
         print u"Calculamos Media Aritmética"
 
-    def desviacion_tipica(self, widget, data=None):
-        print u"Calculamos Desviación Típica"
+    def rango(self, widget, data=None):
+        print u"Rango"
+
+    def importar_fichero_cvs(self, widget, data=None):
+        dialog = gtk.FileChooserDialog("Open..",
+                                       None,
+                                       gtk.FILE_CHOOSER_ACTION_OPEN,
+                                       (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                        gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        dialog.set_default_response(gtk.RESPONSE_OK)
+
+        filter = gtk.FileFilter()
+        filter.set_name("All files")
+        filter.add_pattern("*")
+        dialog.add_filter(filter)
+
+        filter = gtk.FileFilter()
+        filter.set_name("Images")
+        filter.add_mime_type("image/png")
+        filter.add_mime_type("image/jpeg")
+        filter.add_mime_type("image/gif")
+        filter.add_pattern("*.png")
+        filter.add_pattern("*.jpg")
+        filter.add_pattern("*.gif")
+        filter.add_pattern("*.tif")
+        filter.add_pattern("*.xpm")
+        dialog.add_filter(filter)
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            print dialog.get_filename(), 'selected'
+            copyfile(dialog.get_filename(), "ojete_2.pdf")
+        elif response == gtk.RESPONSE_CANCEL:
+            print 'Closed, no files selected'
+        dialog.destroy()
 
 
 PyApp()
