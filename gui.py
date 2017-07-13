@@ -98,30 +98,17 @@ class PyApp(gtk.Window):
                                         gtk.STOCK_OPEN, gtk.RESPONSE_OK))
         dialog.set_default_response(gtk.RESPONSE_OK)
 
-        '''
-        filter = gtk.FileFilter()
-        filter.set_name("All files")
-        filter.add_pattern("*")
-        dialog.add_filter(filter)
-
-        filter = gtk.FileFilter()
-        filter.set_name("Images")
-        filter.add_mime_type("image/png")
-        filter.add_mime_type("image/jpeg")
-        filter.add_mime_type("image/gif")
-        filter.add_pattern("*.png")
-        filter.add_pattern("*.jpg")
-        filter.add_pattern("*.gif")
-        filter.add_pattern("*.tif")
-        filter.add_pattern("*.xpm")
-        dialog.add_filter(filter)
-        '''
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
-            print dialog.get_filename(), 'selected'
-            copyfile(dialog.get_filename(), "ojete_2.pdf")
-        elif response == gtk.RESPONSE_CANCEL:
-            print 'Closed, no files selected'
+            extension = dialog.get_filename().split('.')[-1]
+        if response == gtk.RESPONSE_OK and extension == 'csv':
+            copyfile(dialog.get_filename(), "archivo.csv")
+        elif response != gtk.RESPONSE_CANCEL and response != gtk.RESPONSE_DELETE_EVENT:
+            md = gtk.MessageDialog(self,
+                                   gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
+                                   gtk.BUTTONS_CLOSE, "Formato de archivo incorrecto")
+            md.run()
+            md.destroy()
         dialog.destroy()
 
 
