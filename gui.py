@@ -20,6 +20,7 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 from shutil import copyfile
+import pandas as pd
 
 
 class PyApp(gtk.Window):
@@ -103,6 +104,12 @@ class PyApp(gtk.Window):
             extension = dialog.get_filename().split('.')[-1]
         if response == gtk.RESPONSE_OK and extension == 'csv':
             copyfile(dialog.get_filename(), "archivo.csv")
+
+            csvarchivo = pd.read_csv("archivo.csv", encoding='utf-8')
+            print len(csvarchivo.columns)
+        
+
+
         elif response != gtk.RESPONSE_CANCEL and response != gtk.RESPONSE_DELETE_EVENT:
             md = gtk.MessageDialog(self,
                                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
