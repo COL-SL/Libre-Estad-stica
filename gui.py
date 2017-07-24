@@ -21,7 +21,8 @@ pygtk.require('2.0')
 import gtk
 from shutil import copyfile
 import pandas as pd
-
+import numpy as np
+import text_area as ta
 
 class PyApp(gtk.Window):
     def __init__(self):
@@ -31,6 +32,7 @@ class PyApp(gtk.Window):
         self.set_size_request(450, 400)
         self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(6400, 6400, 6440))
         self.set_position(gtk.WIN_POS_CENTER)
+        self.NAME_FILE = "archivo.csv"
 
         mb = gtk.MenuBar()
 
@@ -86,7 +88,11 @@ class PyApp(gtk.Window):
         self.show_all()
 
     def media_aritmetica(self, widget, data=None):
-        print u"Calculamos Media Aritmética"
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0,num_column):
+            print u"Media Aritmética para",csvarchivo.columns[i],'-->', np.average(csvarchivo.as_matrix()[:,i])
 
     def rango(self, widget, data=None):
         print u"Rango"
@@ -103,13 +109,8 @@ class PyApp(gtk.Window):
         if response == gtk.RESPONSE_OK:
             extension = dialog.get_filename().split('.')[-1]
         if response == gtk.RESPONSE_OK and extension == 'csv':
-            copyfile(dialog.get_filename(), "archivo.csv")
-
-            csvarchivo = pd.read_csv("archivo.csv", encoding='utf-8')
-            print len(csvarchivo.columns)
-        
-
-
+            filename = dialog.get_filename()
+            copyfile(filename, self.NAME_FILE)
         elif response != gtk.RESPONSE_CANCEL and response != gtk.RESPONSE_DELETE_EVENT:
             md = gtk.MessageDialog(self,
                                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
@@ -117,7 +118,6 @@ class PyApp(gtk.Window):
             md.run()
             md.destroy()
         dialog.destroy()
-
 
 PyApp()
 gtk.main()
