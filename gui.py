@@ -22,7 +22,7 @@ import gtk
 from shutil import copyfile
 import pandas as pd
 import numpy as np
-import text_area as ta
+from text_area import probando_clase as pc, text_area as ta
 
 class PyApp(gtk.Window):
     def __init__(self):
@@ -93,6 +93,11 @@ class PyApp(gtk.Window):
 
         for i in range(0,num_column):
             print u"Media Aritmética para",csvarchivo.columns[i],'-->', np.average(csvarchivo.as_matrix()[:,i])
+
+        mercedez = pc.Coche(0, 'Mercedez Benz', 15)
+        mercedez.acelerar()
+
+        X = ta.EntryExample()
 
     def rango(self, widget, data=None):
         print u"Rango"
