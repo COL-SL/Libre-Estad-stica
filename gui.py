@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 '''
+
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -25,14 +26,19 @@ import numpy as np
 from Tkinter import *
 
 class PyApp(gtk.Window):
+
+
     def __init__(self):
         super(PyApp, self).__init__()
 
         self.set_title(u"Libre Estadística")
-        self.set_size_request(300, 100)
+        self.set_size_request(300, 70)
         self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(6400, 6400, 6440))
         self.set_position(gtk.WIN_POS_CENTER)
         self.NAME_FILE = "archivo.csv"
+        self.lista_concatenada = []
+        self.num_column_before = 0
+        self.first = False
 
         mb = gtk.MenuBar()
 
@@ -87,41 +93,99 @@ class PyApp(gtk.Window):
         self.connect("destroy", gtk.main_quit)
         self.show_all()
 
+
     def media_aritmetica(self, widget, data=None):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
         num_column = len(csvarchivo.columns)
-        lista_concatenada = []
 
         for i in range(0,num_column):
             cadena = str(u"Media Aritmética para ")+str(csvarchivo.columns[i])+str(u' = ')+str(np.average(csvarchivo.as_matrix()[:,i]))
-            lista_concatenada.append(cadena)
+            self.lista_concatenada.append(cadena)
 
         root = Tk()
         root.title("Resultado ")
-        w = 500
-        h = 250
-        x = 570
-        y = 520
-        # use width x height + x_offset + y_offset (no spaces!)
-        root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
         S = Scrollbar(root)
-        T = Text(root, height=10, width=80)
+        T = Text(root, height=10, width=100)
         S.pack(side=RIGHT, fill=Y)
         T.pack(side=LEFT, fill=Y)
         S.config(command=T.yview)
         T.config(yscrollcommand=S.set)
         quote = ''
 
-        for i in range (0, len(lista_concatenada)):
-            quote = quote + lista_concatenada[i]
+        for i in range (0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
             quote = quote + '\n'
 
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
         T.insert(END, quote)
+        T.see(END)
         T.config(state='disabled')
         root.mainloop()
 
+
     def rango(self, widget, data=None):
-        print u"Rango"
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            matrix = np.matrix(csvarchivo.as_matrix()[:,i])
+            valor_maximo = matrix.max()
+            valor_minimo = matrix.min()
+            rango = valor_maximo - valor_minimo
+            cadena = str(u"Rango para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(rango)
+            self.lista_concatenada.append(cadena)
+
+        root = Tk()
+        root.title("Resultado ")
+
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(root)
+        T = Text(root, height=10, width=100)
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        T.focus_set()
+        T.see(END)
+        T.config(state='disabled')
+        root.mainloop()
+
 
     def importar_fichero_cvs(self, widget, data=None):
         dialog = gtk.FileChooserDialog("Abrir..",
@@ -144,6 +208,7 @@ class PyApp(gtk.Window):
             md.run()
             md.destroy()
         dialog.destroy()
+
 
 PyApp()
 gtk.main()
