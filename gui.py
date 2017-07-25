@@ -22,7 +22,6 @@ import gtk
 from shutil import copyfile
 import pandas as pd
 import numpy as np
-from text_area import probando_clase as pc, text_area as ta
 from Tkinter import *
 
 class PyApp(gtk.Window):
