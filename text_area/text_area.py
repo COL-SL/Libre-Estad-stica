@@ -19,11 +19,11 @@ class EntryExample:
     def entry_toggle_visibility(self, checkbutton, entry):
         entry.set_visibility(checkbutton.get_active())
 
-    def __init__(self):
+    def __init__(self, frase):
         # create a new window
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_size_request(200, 100)
-        window.set_title("GTK Entry")
+        window.set_size_request(200, 200)
+        window.set_title("Resultado")
         window.connect("delete_event", lambda w, e: gtk.main_quit())
 
         vbox = gtk.VBox(False, 0)
@@ -33,8 +33,8 @@ class EntryExample:
         entry = gtk.Entry()
         entry.set_max_length(50)
         entry.connect("activate", self.enter_callback, entry)
-        entry.set_text("hello")
-        entry.insert_text(" world", len(entry.get_text()))
+        #entry.set_text("hel")
+        entry.insert_text(frase, len(entry.get_text()))
         entry.select_region(0, len(entry.get_text()))
         vbox.pack_start(entry, True, True, 0)
         entry.show()

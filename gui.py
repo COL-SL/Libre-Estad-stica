@@ -23,13 +23,14 @@ from shutil import copyfile
 import pandas as pd
 import numpy as np
 from text_area import probando_clase as pc, text_area as ta
+from Tkinter import *
 
 class PyApp(gtk.Window):
     def __init__(self):
         super(PyApp, self).__init__()
 
         self.set_title(u"Libre Estadística")
-        self.set_size_request(450, 400)
+        self.set_size_request(300, 100)
         self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(6400, 6400, 6440))
         self.set_position(gtk.WIN_POS_CENTER)
         self.NAME_FILE = "archivo.csv"
@@ -90,14 +91,35 @@ class PyApp(gtk.Window):
     def media_aritmetica(self, widget, data=None):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
         num_column = len(csvarchivo.columns)
+        lista_concatenada = []
 
         for i in range(0,num_column):
-            print u"Media Aritmética para",csvarchivo.columns[i],'-->', np.average(csvarchivo.as_matrix()[:,i])
+            cadena = str(u"Media Aritmética para ")+str(csvarchivo.columns[i])+str(u' = ')+str(np.average(csvarchivo.as_matrix()[:,i]))
+            lista_concatenada.append(cadena)
 
-        mercedez = pc.Coche(0, 'Mercedez Benz', 15)
-        mercedez.acelerar()
+        root = Tk()
+        root.title("Resultado ")
+        w = 500
+        h = 250
+        x = 570
+        y = 520
+        # use width x height + x_offset + y_offset (no spaces!)
+        root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+        S = Scrollbar(root)
+        T = Text(root, height=10, width=80)
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+        quote = ''
 
-        X = ta.EntryExample()
+        for i in range (0, len(lista_concatenada)):
+            quote = quote + lista_concatenada[i]
+            quote = quote + '\n'
+
+        T.insert(END, quote)
+        T.config(state='disabled')
+        root.mainloop()
 
     def rango(self, widget, data=None):
         print u"Rango"
