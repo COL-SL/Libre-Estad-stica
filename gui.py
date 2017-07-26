@@ -26,8 +26,6 @@ import numpy as np
 from Tkinter import *
 
 class PyApp(gtk.Window):
-
-
     def __init__(self):
         super(PyApp, self).__init__()
 
@@ -146,7 +144,7 @@ class PyApp(gtk.Window):
             matrix = np.matrix(csvarchivo.as_matrix()[:,i])
             valor_maximo = matrix.max()
             valor_minimo = matrix.min()
-            rango = valor_maximo - valor_minimo
+            rango = self.calcular_rango(valor_maximo, valor_minimo)
             cadena = str(u"Rango para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(rango)
             self.lista_concatenada.append(cadena)
 
@@ -185,6 +183,11 @@ class PyApp(gtk.Window):
         T.see(END)
         T.config(state='disabled')
         root.mainloop()
+
+
+    def calcular_rango(self,valor_maximo, valor_minimo):
+        rango = valor_maximo - valor_minimo
+        return rango
 
 
     def importar_fichero_cvs(self, widget, data=None):
