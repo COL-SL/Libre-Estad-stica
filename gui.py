@@ -24,6 +24,8 @@ from shutil import copyfile
 import pandas as pd
 import numpy as np
 from Tkinter import *
+import statistics as st
+
 
 class PyApp(gtk.Window):
     def __init__(self):
@@ -66,15 +68,24 @@ class PyApp(gtk.Window):
         mediam = gtk.MenuItem(u"Medidas Tendencia Central")
         mediam.set_submenu(imenu_two)
         mediam_sub = gtk.MenuItem(u"Media aritmética")
+        modam_sub = gtk.MenuItem(u"Mediana")
         mediam_sub.connect("activate", self.media_aritmetica, None)
+        modam_sub.connect("activate", self.mediana, None)
 
         imenu_three = gtk.Menu()
         dispersionm = gtk.MenuItem(u"Medidas Dispersión")
         dispersionm.set_submenu(imenu_three)
         dispersionm_sub = gtk.MenuItem(u"Rango")
+        variancem_sub = gtk.MenuItem(u"Varianza")
+        desviacionm_sub = gtk.MenuItem(u"Desviación Típica")
         dispersionm_sub.connect("activate", self.rango, None)
+        variancem_sub.connect("activate", self.varianza, None)
+        desviacionm_sub.connect("activate", self.desviacion_tipica, None)
         imenu_three.append(dispersionm_sub)
+        imenu_three.append(variancem_sub)
+        imenu_three.append(desviacionm_sub)
         imenu_two.append(mediam_sub)
+        imenu_two.append(modam_sub)
         toolmenu.append(mediam)
         toolmenu.append(dispersionm)
         mb.append(toolm)
@@ -90,6 +101,156 @@ class PyApp(gtk.Window):
 
         self.connect("destroy", gtk.main_quit)
         self.show_all()
+
+
+    def desviacion_tipica(self, widget, data=None):
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            result_deviation = self.calcular_desviacion_tipica(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Desviación Típica para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_deviation)
+            self.lista_concatenada.append(cadena)
+
+        root = Tk()
+        root.title("Resultado ")
+
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(root)
+        T = Text(root, height=10, width=100)
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        T.focus_set()
+        T.see(END)
+        T.config(state='disabled')
+        root.mainloop()
+
+
+    def calcular_desviacion_tipica(self, value_matrix):
+        return np.std(value_matrix)
+
+
+    def varianza(self, widget, data=None):
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            result_variance= self.calcular_varianza(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Varianza para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_variance)
+            self.lista_concatenada.append(cadena)
+
+        root = Tk()
+        root.title("Resultado ")
+
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(root)
+        T = Text(root, height=10, width=100)
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        T.focus_set()
+        T.see(END)
+        T.config(state='disabled')
+        root.mainloop()
+
+
+    def calcular_varianza(self,value_matrix):
+        return np.var(value_matrix)
+
+
+    def mediana(self, widget, data=None):
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            result_median = self.calcular_mediana(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Mediana para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_median)
+            self.lista_concatenada.append(cadena)
+
+        root = Tk()
+        root.title("Resultado ")
+
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(root)
+        T = Text(root, height=10, width=100)
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        T.focus_set()
+        T.see(END)
+        T.config(state='disabled')
+        root.mainloop()
+
+
+    def calcular_mediana(self,value_matrix):
+        return float(np.median(value_matrix))
 
 
     def media_aritmetica(self, widget, data=None):
