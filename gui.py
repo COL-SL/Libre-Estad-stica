@@ -51,7 +51,8 @@ class PyApp(gtk.Window):
         importm.set_submenu(imenu)
         inews = gtk.MenuItem("Importar fichero cvs...")
         inews.connect("activate", self.importar_fichero_cvs, None)
-        ibookmarks = gtk.MenuItem("Import bookmarks...")
+        ibookmarks = gtk.MenuItem("Probando hija...")
+        ibookmarks.connect("activate", self.probando_hija, None)
         imail = gtk.MenuItem("Import mail...")
         imenu.append(inews)
         imenu.append(ibookmarks)
@@ -102,6 +103,8 @@ class PyApp(gtk.Window):
         self.connect("destroy", gtk.main_quit)
         self.show_all()
 
+    def probando_hija(self, widget, data=None):
+        print "PRObando hija"
 
     def desviacion_tipica(self, widget, data=None):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
@@ -143,6 +146,7 @@ class PyApp(gtk.Window):
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
+        T.grab_set()
         T.focus_set()
         T.see(END)
         T.config(state='disabled')
@@ -196,6 +200,7 @@ class PyApp(gtk.Window):
         T.focus_set()
         T.see(END)
         T.config(state='disabled')
+        #self.root2.destroy()
         root.mainloop()
 
 
