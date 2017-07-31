@@ -1,19 +1,54 @@
-# Modulo coche.py
-# !/usr/bin/env python
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
-class Coche:
-    def __init__(self, velocidad, nombre, temperatura):
-        self.velocidad = velocidad
-        self.nombre = nombre
-        self.temperatura = temperatura
+"""
+ZetCode Tkinter tutorial
 
-    def acelerar(self):
-        self.velocidad += 1
-        print 'La velocidad actual es de ', self.velocidad
+In this script we create a submenu
+a separator and keyboard shortcuts to menus.
 
-    def frenar(self):
-        if self.velocidad == 0:
-            print 'El carro se ha detenido'
-        else:
-            self.velocidad -= 1
-            print 'La velocidad actual es de ', self.velocidad
+Author: Jan Bodnar
+Last modified: July 2017
+Website: www.zetcode.com
+"""
+
+from Tkinter import Tk, Frame, Menu
+
+
+class Example(Frame):
+    def __init__(self):
+
+        self.initUI()
+
+    def initUI(self):
+        self.master.title("Submenu")
+
+        menubar = Menu(self.master)
+        self.master.config(menu=menubar)
+
+        fileMenu = Menu(menubar)
+
+        submenu = Menu(fileMenu)
+        submenu.add_command(label="New feed")
+        submenu.add_command(label="Bookmarks")
+        submenu.add_command(label="Mail")
+        fileMenu.add_cascade(label='Import', menu=submenu, underline=0)
+
+        fileMenu.add_separator()
+
+        fileMenu.add_command(label="Exit", underline=0, command=self.onExit)
+        menubar.add_cascade(label="File", underline=0, menu=fileMenu)
+
+    def onExit(self):
+        self.quit()
+
+
+def main():
+    root = Tk()
+    root.geometry("250x150+300+300")
+    app = Example()
+    root.mainloop()
+
+
+if __name__ == '__main__':
+    main() 

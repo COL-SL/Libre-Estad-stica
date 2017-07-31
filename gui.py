@@ -23,12 +23,69 @@ import gtk
 from shutil import copyfile
 import pandas as pd
 import numpy as np
+import Tkinter as tk
 from Tkinter import *
 import statistics as st
 
 
-class PyApp(gtk.Window):
+class PyApp():
     def __init__(self):
+
+
+        self.NAME_FILE = "archivo.csv"
+        self.lista_concatenada = []
+        self.num_column_before = 0
+        self.first = False
+        self.counter  = 0
+
+        #tk.Frame.__init__(self, *args, **kwargs)
+
+        self.root = Tk()
+        self.root.wm_title(u"Libre Estadística")
+        menubar = Menu(self.root)
+
+        
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Nuevo", command=self.donothing)
+        filemenu.add_command(label="Abrir", command=self.donothing)
+        filemenu.add_command(label="Guardar", command=self.donothing)
+        filemenu.add_command(label="Guardar Como...", command=self.donothing)
+        filemenu.add_command(label="Cerrar", command=self.donothing)
+
+        filemenu.add_separator()
+
+        filemenu.add_command(label="Salir", command=self.root.quit)
+        menubar.add_cascade(label="Fichero", menu=filemenu)
+        editmenu = Menu(menubar, tearoff=0)
+        editmenu.add_command(label="Undo", command=self.donothing)
+
+        editmenu.add_separator()
+
+
+        submenu = Menu(editmenu)
+        submenu.add_command(label="New feed")
+        submenu.add_command(label="Bookmarks")
+        submenu.add_command(label="Mail")
+
+        editmenu.add_command(label="Medidas Tendencia Central", command=self.donothing)
+        editmenu.add_command(label=u"Medidas Dispersión", command=self.donothing)
+        editmenu.add_command(label="Paste", command=self.donothing)
+        editmenu.add_command(label="Delete", command=self.donothing)
+        editmenu.add_command(label="Select All", command=self.donothing)
+
+
+
+
+
+        menubar.add_cascade(label="Editar", menu=editmenu)
+        helpmenu = Menu(menubar, tearoff=0)
+        helpmenu.add_command(label="Help Index", command=self.donothing)
+        helpmenu.add_command(label="About...", command=self.donothing)
+        menubar.add_cascade(label="Help", menu=helpmenu)
+
+        self.root.config(menu=menubar)
+        self.root.mainloop()
+        '''
         super(PyApp, self).__init__()
 
         self.set_title(u"Libre Estadística")
@@ -102,6 +159,64 @@ class PyApp(gtk.Window):
 
         self.connect("destroy", gtk.main_quit)
         self.show_all()
+    '''
+    def donothing(self):
+        '''
+        filewin = Toplevel(self.root)
+        self.root.title("Resul ")
+        button = Button(filewin, text="Do nothing button")
+        button.pack()
+        
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            result_deviation = self.calcular_desviacion_tipica(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Desviación Típica para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_deviation)
+            self.lista_concatenada.append(cadena)
+
+        self.root = Tk()
+        self.root.title("Resultado ")
+
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        self.root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(self.root)
+        T = Text(self.root, height=10, width=100)
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        T.grab_set()
+        T.focus_set()
+        T.see(END)
+        T.config(state='disabled')
+        self.root.mainloop()
+        '''
+        self.counter += 1
+        t = Toplevel(self.root)
+        t.wm_title("Window #%s" % self.counter)
+        l = tk.Label(t, text="This is window #%s" % self.counter)
+        l.pack(side="top", fill="both", expand=True, padx=100, pady=100)
 
     def probando_hija(self, widget, data=None):
         print "PRObando hija"
@@ -379,5 +494,7 @@ class PyApp(gtk.Window):
         dialog.destroy()
 
 
-PyApp()
-gtk.main()
+if __name__ == "__main__":
+    PyApp()
+
+
