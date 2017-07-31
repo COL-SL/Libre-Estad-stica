@@ -26,65 +26,68 @@ import numpy as np
 import Tkinter as tk
 from Tkinter import *
 import statistics as st
+from tkFileDialog import askopenfilename
+import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
+import os
+
 
 
 class PyApp():
     def __init__(self):
-
-
         self.NAME_FILE = "archivo.csv"
         self.lista_concatenada = []
         self.num_column_before = 0
         self.first = False
         self.counter  = 0
+        self.root2 = ''
 
         #tk.Frame.__init__(self, *args, **kwargs)
-
         self.root = Tk()
         self.root.wm_title(u"Libre Estadística")
         menubar = Menu(self.root)
 
-        
-        filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Nuevo", command=self.donothing)
-        filemenu.add_command(label="Abrir", command=self.donothing)
-        filemenu.add_command(label="Guardar", command=self.donothing)
-        filemenu.add_command(label="Guardar Como...", command=self.donothing)
-        filemenu.add_command(label="Cerrar", command=self.donothing)
+        try:
+            filemenu = Menu(menubar, tearoff=0)
+            filemenu = Menu(menubar, tearoff=0)
+            filemenu.add_command(label="Nuevo", command=self.donothing)
+            filemenu.add_command(label="Abrir", command=self.importar_fichero_cvs)
+            filemenu.add_command(label="Guardar", command=self.donothing)
+            filemenu.add_command(label="Guardar Como...", command=self.donothing)
+            filemenu.add_command(label="Cerrar", command=self.donothing)
 
-        filemenu.add_separator()
+            filemenu.add_separator()
 
-        filemenu.add_command(label="Salir", command=self.root.quit)
-        menubar.add_cascade(label="Fichero", menu=filemenu)
-        editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Undo", command=self.donothing)
+            filemenu.add_command(label="Salir", command=self.root.quit)
+            menubar.add_cascade(label="Fichero", menu=filemenu)
 
-        editmenu.add_separator()
-
-
-        submenu = Menu(editmenu)
-        submenu.add_command(label="New feed")
-        submenu.add_command(label="Bookmarks")
-        submenu.add_command(label="Mail")
-
-        editmenu.add_command(label="Medidas Tendencia Central", command=self.donothing)
-        editmenu.add_command(label=u"Medidas Dispersión", command=self.donothing)
-        editmenu.add_command(label="Paste", command=self.donothing)
-        editmenu.add_command(label="Delete", command=self.donothing)
-        editmenu.add_command(label="Select All", command=self.donothing)
+            editmenu = Menu(menubar, tearoff=0)
+            editmenu.add_command(label="Undo", command=self.donothing)
 
 
 
+            editmenu.add_separator()
 
+            centralmenu = Menu(editmenu, tearoff=0)
+            centralmenu.add_command(label=u"Media aritmética", command=self.media_aritmetica)
 
-        menubar.add_cascade(label="Editar", menu=editmenu)
-        helpmenu = Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="Help Index", command=self.donothing)
-        helpmenu.add_command(label="About...", command=self.donothing)
-        menubar.add_cascade(label="Help", menu=helpmenu)
+            editmenu.add_cascade(label="Medidas Tendencia Central", menu=centralmenu)
+            editmenu.add_command(label=u"Medidas Dispersión", command=self.donothing)
+            editmenu.add_command(label="Paste", command=self.donothing)
+            editmenu.add_command(label="Delete", command=self.donothing)
+            editmenu.add_command(label="Select All", command=self.donothing)
 
-        self.root.config(menu=menubar)
-        self.root.mainloop()
+            menubar.add_cascade(label="Editar", menu=editmenu)
+            helpmenu = Menu(menubar, tearoff=0)
+            helpmenu.add_command(label="Help Index", command=self.donothing)
+            helpmenu.add_command(label="About...", command=self.donothing)
+            menubar.add_cascade(label="Help", menu=helpmenu)
+
+            self.root.config(menu=menubar)
+            self.root.mainloop()
+        except:
+            pass
+            self.root.destroy()
+
         '''
         super(PyApp, self).__init__()
 
@@ -261,7 +264,7 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
-        T.grab_set()
+        #T.grab_set()
         T.focus_set()
         T.see(END)
         T.config(state='disabled')
@@ -373,7 +376,7 @@ class PyApp():
         return float(np.median(value_matrix))
 
 
-    def media_aritmetica(self, widget, data=None):
+    def media_aritmetica(self):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
         num_column = len(csvarchivo.columns)
 
@@ -381,11 +384,16 @@ class PyApp():
             cadena = str(u"Media Aritmética para ")+str(csvarchivo.columns[i])+str(u' = ')+str(np.average(csvarchivo.as_matrix()[:,i]))
             self.lista_concatenada.append(cadena)
 
-        root = Tk()
-        root.title("Resultado ")
+        self.counter += 1
 
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+        if self.first == True:
+            self.root2.destroy()
+
+        self.root2 = Toplevel(self.root)
+        self.root2.title("Resultado #%s" % self.counter)
+
+        screen_width = self.root2.winfo_screenwidth()
+        screen_height = self.root2.winfo_screenheight()
 
         width = 600
         height = 200
@@ -393,10 +401,10 @@ class PyApp():
         # calculate position x and y coordinates
         x = (screen_width / 2) - (width / 2)
         y = (screen_height / 2) - (height / 2)
-        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+        self.root2.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
-        S = Scrollbar(root)
-        T = Text(root, height=10, width=100)
+        S = Scrollbar(self.root2)
+        T = Text(self.root2, height=10, width=100)
         S.pack(side=RIGHT, fill=Y)
         T.pack(side=LEFT, fill=Y)
         S.config(command=T.yview)
@@ -413,8 +421,9 @@ class PyApp():
         self.first = True
         T.insert(END, quote)
         T.see(END)
+        #T.grab_set()
         T.config(state='disabled')
-        root.mainloop()
+        self.root.mainloop()
 
 
     def rango(self, widget, data=None):
@@ -471,27 +480,30 @@ class PyApp():
         return rango
 
 
-    def importar_fichero_cvs(self, widget, data=None):
-        dialog = gtk.FileChooserDialog("Abrir..",
-                                       None,
-                                       gtk.FILE_CHOOSER_ACTION_OPEN,
-                                       (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                        gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-        dialog.set_default_response(gtk.RESPONSE_OK)
+    def importar_fichero_cvs(self):
+            try:
+                # Make a top-level instance and hide since it is ugly and big.
+                self.root3 = Tkinter.Tk()
+                self.root3.withdraw()
 
-        response = dialog.run()
-        if response == gtk.RESPONSE_OK:
-            extension = dialog.get_filename().split('.')[-1]
-        if response == gtk.RESPONSE_OK and extension == 'csv':
-            filename = dialog.get_filename()
-            copyfile(filename, self.NAME_FILE)
-        elif response != gtk.RESPONSE_CANCEL and response != gtk.RESPONSE_DELETE_EVENT:
-            md = gtk.MessageDialog(self,
-                                   gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
-                                   gtk.BUTTONS_CLOSE, "Formato de archivo incorrecto")
-            md.run()
-            md.destroy()
-        dialog.destroy()
+                # Make it almost invisible - no decorations, 0 size, top left corner.
+                self.root3.overrideredirect(True)
+                self.root3.geometry('0x0+0+0')
+
+                # Show window again and lift it to top so it can get focus,
+                # otherwise dialogs will end up behind the terminal.
+                self.root3.deiconify()
+                self.root3.lift()
+                self.root3.focus_force()
+
+                filenames = tkFileDialog.askopenfilenames(parent=self.root)  # Or some other dialog
+                print filenames
+
+                # Get rid of the top-level instance once to make it actually invisible.
+                #self.root.destroy()
+            except:
+                pass
+                self.root3.destroy()
 
 
 if __name__ == "__main__":
