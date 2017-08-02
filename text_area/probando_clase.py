@@ -1,6 +1,8 @@
-from Tkinter import Tk
-from tkFileDialog import askopenfilename
+from Tkinter import *
 
-Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-filename = askopenfilename() # show an "Open" dialog box and return the path to the selected file
-print(filename)
+root = Tk()
+
+icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/text_area/lararov_6.gif")
+root.tk.call('wm', 'iconphoto', root._w, icon)
+
+root.mainloop()

@@ -45,6 +45,9 @@ class PyApp():
         #tk.Frame.__init__(self, *args, **kwargs)
         self.root = Tk()
         self.root.wm_title(u"Libre Estadística")
+        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/lararov_6.gif")
+        self.root.tk.call('wm', 'iconphoto', self.root._w, icon)
+
         menubar = Menu(self.root)
 
         try:
@@ -58,7 +61,7 @@ class PyApp():
 
             filemenu.add_separator()
 
-            filemenu.add_command(label="Salir", command=self.root.quit)
+            filemenu.add_command(label="Salir", command=self.close)
             menubar.add_cascade(label="Fichero", menu=filemenu)
 
 
@@ -166,6 +169,10 @@ class PyApp():
         self.connect("destroy", gtk.main_quit)
         self.show_all()
     '''
+    def close(self):
+        self.root.destroy()
+
+
     def donothing(self):
         '''
         filewin = Toplevel(self.root)
@@ -394,6 +401,11 @@ class PyApp():
 
         self.root2 = Toplevel(self.root)
         self.root2.title("Resultado #%s" % self.counter)
+        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/lararov_6.gif")
+        self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
+        #self.root2.iconify()
+
+        self.root2.deiconify()
 
         screen_width = self.root2.winfo_screenwidth()
         screen_height = self.root2.winfo_screenheight()
@@ -446,8 +458,15 @@ class PyApp():
         if self.first == True:
             self.root2.destroy()
 
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+        self.root2 = Toplevel(self.root)
+        self.root2.title("Resultado #%s" % self.counter)
+        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/lararov_6.gif")
+        self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
+        #self.root2.iconify()
+        self.root2.deiconify()
+
+        screen_width = self.root2.winfo_screenwidth()
+        screen_height = self.root2.winfo_screenheight()
 
         width = 600
         height = 200
@@ -455,10 +474,10 @@ class PyApp():
         # calculate position x and y coordinates
         x = (screen_width / 2) - (width / 2)
         y = (screen_height / 2) - (height / 2)
-        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+        self.root2.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
-        S = Scrollbar(root)
-        T = Text(root, height=10, width=100)
+        S = Scrollbar(self.root2)
+        T = Text(self.root2, height=10, width=100)
         S.pack(side=RIGHT, fill=Y)
         T.pack(side=LEFT, fill=Y)
         S.config(command=T.yview)
@@ -474,10 +493,10 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
-        T.focus_set()
         T.see(END)
+        # T.grab_set()
         T.config(state='disabled')
-        root.mainloop()
+        self.root.mainloop()
 
 
     def calcular_rango(self,valor_maximo, valor_minimo):
