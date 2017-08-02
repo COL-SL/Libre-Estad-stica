@@ -40,6 +40,7 @@ class PyApp():
         self.first = False
         self.counter  = 0
         self.root2 = ''
+        self.root3 = ''
 
         #tk.Frame.__init__(self, *args, **kwargs)
         self.root = Tk()
@@ -60,6 +61,7 @@ class PyApp():
             filemenu.add_command(label="Salir", command=self.root.quit)
             menubar.add_cascade(label="Fichero", menu=filemenu)
 
+
             editmenu = Menu(menubar, tearoff=0)
             editmenu.add_command(label="Undo", command=self.donothing)
 
@@ -69,6 +71,7 @@ class PyApp():
 
             centralmenu = Menu(editmenu, tearoff=0)
             centralmenu.add_command(label=u"Media aritmética", command=self.media_aritmetica)
+            centralmenu.add_command(label=u"Rango", command=self.rango)
 
             editmenu.add_cascade(label="Medidas Tendencia Central", menu=centralmenu)
             editmenu.add_command(label=u"Medidas Dispersión", command=self.donothing)
@@ -426,7 +429,7 @@ class PyApp():
         self.root.mainloop()
 
 
-    def rango(self, widget, data=None):
+    def rango(self):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
         num_column = len(csvarchivo.columns)
 
@@ -438,8 +441,10 @@ class PyApp():
             cadena = str(u"Rango para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(rango)
             self.lista_concatenada.append(cadena)
 
-        root = Tk()
-        root.title("Resultado ")
+        self.counter += 1
+
+        if self.first == True:
+            self.root2.destroy()
 
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
@@ -498,11 +503,13 @@ class PyApp():
 
                 filenames = tkFileDialog.askopenfilenames(parent=self.root)  # Or some other dialog
                 print filenames
+                self.root3.destroy()
 
                 # Get rid of the top-level instance once to make it actually invisible.
                 #self.root.destroy()
             except:
-                pass
+                #pass
+                print "llegamos aqui Salimos"
                 self.root3.destroy()
 
 
