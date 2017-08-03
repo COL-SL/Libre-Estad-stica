@@ -26,10 +26,10 @@ import numpy as np
 import Tkinter as tk
 from Tkinter import *
 import statistics as st
-from tkFileDialog import askopenfilename
+from tkFileDialog import askopenfilename,asksaveasfile
 import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
 import os
-
+import shutil
 
 
 class PyApp():
@@ -45,7 +45,7 @@ class PyApp():
         #tk.Frame.__init__(self, *args, **kwargs)
         self.root = Tk()
         self.root.wm_title(u"Libre Estadística")
-        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/imagenes/lararov_6.gif")
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon)
 
         menubar = Menu(self.root)
@@ -55,7 +55,7 @@ class PyApp():
             filemenu = Menu(menubar, tearoff=0)
             filemenu.add_command(label="Nuevo", command=self.donothing)
             filemenu.add_command(label="Abrir archivo csv", command=self.importar_fichero_cvs)
-            filemenu.add_command(label="Guardar", command=self.donothing)
+            filemenu.add_command(label="Guardar Resultados", command=self.guardar)
             filemenu.add_command(label="Guardar Como...", command=self.donothing)
             filemenu.add_command(label="Cerrar", command=self.donothing)
 
@@ -76,8 +76,12 @@ class PyApp():
             centralmenu.add_command(label=u"Media aritmética", command=self.media_aritmetica)
             centralmenu.add_command(label=u"Rango", command=self.rango)
 
+            dipersionmenu = Menu(editmenu, tearoff=0)
+            dipersionmenu.add_command(label=u"Varianza", command=self.varianza)
+            dipersionmenu.add_command(label=u"Desviación Típica", command=self.desviacion_tipica)
+
             editmenu.add_cascade(label="Medidas Tendencia Central", menu=centralmenu)
-            editmenu.add_command(label=u"Medidas Dispersión", command=self.donothing)
+            editmenu.add_cascade(label=u"Medidas Dispersión", menu=dipersionmenu)
             editmenu.add_command(label="Paste", command=self.donothing)
             editmenu.add_command(label="Delete", command=self.donothing)
             editmenu.add_command(label="Select All", command=self.donothing)
@@ -91,7 +95,6 @@ class PyApp():
             self.root.config(menu=menubar)
             self.root.mainloop()
         except:
-            pass
             self.root.destroy()
 
         '''
@@ -234,7 +237,16 @@ class PyApp():
     def probando_hija(self, widget, data=None):
         print "PRObando hija"
 
-    def desviacion_tipica(self, widget, data=None):
+    def guardar(self):
+        f = tkFileDialog.asksaveasfile(mode='w', defaultextension=".txt")
+        if f is None:  # asksaveasfile return `None` if dialog closed with "cancel".
+            return
+        print str(f).split(',')
+        #text2save = str(text.get(1.0, END))  # starts from `1.0`, not `0.0`
+        #f.write(text2save)
+        #f.close()  # `()` was missing.
+
+    def desviacion_tipica(self):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
         num_column = len(csvarchivo.columns)
 
@@ -243,11 +255,21 @@ class PyApp():
             cadena = str(u"Desviación Típica para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_deviation)
             self.lista_concatenada.append(cadena)
 
-        root = Tk()
-        root.title("Resultado ")
+        if self.first == True:
+            self.root2.quit()
+            self.root2.destroy()
 
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+        self.root2 = Toplevel(self.root)
+
+        self.root2.title("Resultado #%s" % self.counter)
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
+        self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
+        # self.root2.iconify()
+
+        self.root2.deiconify()
+
+        screen_width = self.root2.winfo_screenwidth()
+        screen_height = self.root2.winfo_screenheight()
 
         width = 600
         height = 200
@@ -255,14 +277,16 @@ class PyApp():
         # calculate position x and y coordinates
         x = (screen_width / 2) - (width / 2)
         y = (screen_height / 2) - (height / 2)
-        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+        self.root2.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
-        S = Scrollbar(root)
-        T = Text(root, height=10, width=100)
+        S = Scrollbar(self.root2)
+        T = Text(self.root2, height=10, width=100)
+
         S.pack(side=RIGHT, fill=Y)
         T.pack(side=LEFT, fill=Y)
         S.config(command=T.yview)
         T.config(yscrollcommand=S.set)
+
         quote = ''
 
         for i in range(0, len(self.lista_concatenada)):
@@ -274,18 +298,17 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
-        #T.grab_set()
-        T.focus_set()
         T.see(END)
+        # T.grab_set()
         T.config(state='disabled')
-        root.mainloop()
+        self.root.mainloop()
 
 
     def calcular_desviacion_tipica(self, value_matrix):
         return np.std(value_matrix)
 
 
-    def varianza(self, widget, data=None):
+    def varianza(self):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
         num_column = len(csvarchivo.columns)
 
@@ -294,11 +317,21 @@ class PyApp():
             cadena = str(u"Varianza para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_variance)
             self.lista_concatenada.append(cadena)
 
-        root = Tk()
-        root.title("Resultado ")
+        if self.first == True:
+            self.root2.quit()
+            self.root2.destroy()
 
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+        self.root2 = Toplevel(self.root)
+
+        self.root2.title("Resultado #%s" % self.counter)
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
+        self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
+        # self.root2.iconify()
+
+        self.root2.deiconify()
+
+        screen_width = self.root2.winfo_screenwidth()
+        screen_height = self.root2.winfo_screenheight()
 
         width = 600
         height = 200
@@ -306,14 +339,16 @@ class PyApp():
         # calculate position x and y coordinates
         x = (screen_width / 2) - (width / 2)
         y = (screen_height / 2) - (height / 2)
-        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
+        self.root2.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
-        S = Scrollbar(root)
-        T = Text(root, height=10, width=100)
+        S = Scrollbar(self.root2)
+        T = Text(self.root2, height=10, width=100)
+
         S.pack(side=RIGHT, fill=Y)
         T.pack(side=LEFT, fill=Y)
         S.config(command=T.yview)
         T.config(yscrollcommand=S.set)
+
         quote = ''
 
         for i in range(0, len(self.lista_concatenada)):
@@ -325,11 +360,10 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
-        T.focus_set()
         T.see(END)
+        # T.grab_set()
         T.config(state='disabled')
-        #self.root2.destroy()
-        root.mainloop()
+        self.root.mainloop()
 
 
     def calcular_varianza(self,value_matrix):
@@ -397,11 +431,14 @@ class PyApp():
         self.counter += 1
 
         if self.first == True:
+            self.root2.quit()
             self.root2.destroy()
 
+
         self.root2 = Toplevel(self.root)
+
         self.root2.title("Resultado #%s" % self.counter)
-        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/imagenes/lararov_6.gif")
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
         self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
         #self.root2.iconify()
 
@@ -420,10 +457,12 @@ class PyApp():
 
         S = Scrollbar(self.root2)
         T = Text(self.root2, height=10, width=100)
+
         S.pack(side=RIGHT, fill=Y)
         T.pack(side=LEFT, fill=Y)
         S.config(command=T.yview)
         T.config(yscrollcommand=S.set)
+
         quote = ''
 
         for i in range (0, len(self.lista_concatenada)):
@@ -460,7 +499,7 @@ class PyApp():
 
         self.root2 = Toplevel(self.root)
         self.root2.title("Resultado #%s" % self.counter)
-        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/imagenes/lararov_6.gif")
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
         self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
         #self.root2.iconify()
         self.root2.deiconify()
@@ -520,15 +559,16 @@ class PyApp():
                 self.root3.lift()
                 self.root3.focus_force()
 
-                filenames = tkFileDialog.askopenfilenames(parent=self.root,filetypes=[("CSV Files",".csv")])  # Or some other dialog
-                print filenames[0].split('/')
+                filenames = tkFileDialog.askopenfilenames(parent=self.root,filetypes=[("Archivos CSV",".csv")])  # Or some other dialog
+                filenames = str(filenames).replace("',)", "")
+                filenames = str(filenames).replace("('", "")
+                shutil.copy(filenames, self.NAME_FILE)
                 self.root3.destroy()
-
                 # Get rid of the top-level instance once to make it actually invisible.
                 #self.root.destroy()
             except:
                 #pass
-                print "llegamos aqui Salimos"
+                #print "llegamos aqui Salimos"
                 self.root3.destroy()
 
 
