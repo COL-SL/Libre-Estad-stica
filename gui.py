@@ -45,7 +45,7 @@ class PyApp():
         #tk.Frame.__init__(self, *args, **kwargs)
         self.root = Tk()
         self.root.wm_title(u"Libre Estadística")
-        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/lararov_6.gif")
+        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/imagenes/lararov_6.gif")
         self.root.tk.call('wm', 'iconphoto', self.root._w, icon)
 
         menubar = Menu(self.root)
@@ -54,7 +54,7 @@ class PyApp():
             filemenu = Menu(menubar, tearoff=0)
             filemenu = Menu(menubar, tearoff=0)
             filemenu.add_command(label="Nuevo", command=self.donothing)
-            filemenu.add_command(label="Abrir", command=self.importar_fichero_cvs)
+            filemenu.add_command(label="Abrir archivo csv", command=self.importar_fichero_cvs)
             filemenu.add_command(label="Guardar", command=self.donothing)
             filemenu.add_command(label="Guardar Como...", command=self.donothing)
             filemenu.add_command(label="Cerrar", command=self.donothing)
@@ -401,7 +401,7 @@ class PyApp():
 
         self.root2 = Toplevel(self.root)
         self.root2.title("Resultado #%s" % self.counter)
-        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/lararov_6.gif")
+        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/imagenes/lararov_6.gif")
         self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
         #self.root2.iconify()
 
@@ -460,7 +460,7 @@ class PyApp():
 
         self.root2 = Toplevel(self.root)
         self.root2.title("Resultado #%s" % self.counter)
-        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/lararov_6.gif")
+        icon = PhotoImage(file=r"/home/manueldavid/Escritorio/Programa_estadistica/imagenes/lararov_6.gif")
         self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
         #self.root2.iconify()
         self.root2.deiconify()
@@ -520,8 +520,8 @@ class PyApp():
                 self.root3.lift()
                 self.root3.focus_force()
 
-                filenames = tkFileDialog.askopenfilenames(parent=self.root)  # Or some other dialog
-                print filenames
+                filenames = tkFileDialog.askopenfilenames(parent=self.root,filetypes=[("CSV Files",".csv")])  # Or some other dialog
+                print filenames[0].split('/')
                 self.root3.destroy()
 
                 # Get rid of the top-level instance once to make it actually invisible.
