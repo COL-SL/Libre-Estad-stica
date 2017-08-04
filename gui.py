@@ -34,13 +34,15 @@ import shutil
 
 class PyApp():
     def __init__(self):
-        self.NAME_FILE = "archivo.csv"
+        self.NAME_FILE = "./file_origin/archivo.csv"
+        self.NAME_FILE_SAVE = "./results/results.txt"
         self.lista_concatenada = []
         self.num_column_before = 0
         self.first = False
         self.counter  = 0
         self.root2 = ''
         self.root3 = ''
+        self.file_result_final = open('./results/results.txt', 'w')
 
         #tk.Frame.__init__(self, *args, **kwargs)
         self.root = Tk()
@@ -74,11 +76,12 @@ class PyApp():
 
             centralmenu = Menu(editmenu, tearoff=0)
             centralmenu.add_command(label=u"Media aritmética", command=self.media_aritmetica)
-            centralmenu.add_command(label=u"Rango", command=self.rango)
+            centralmenu.add_command(label=u"Suma", command=self.suma)
 
             dipersionmenu = Menu(editmenu, tearoff=0)
             dipersionmenu.add_command(label=u"Varianza", command=self.varianza)
             dipersionmenu.add_command(label=u"Desviación Típica", command=self.desviacion_tipica)
+            dipersionmenu.add_command(label=u"Rango", command=self.rango)
 
             editmenu.add_cascade(label="Medidas Tendencia Central", menu=centralmenu)
             editmenu.add_cascade(label=u"Medidas Dispersión", menu=dipersionmenu)
@@ -237,34 +240,30 @@ class PyApp():
     def probando_hija(self, widget, data=None):
         print "PRObando hija"
 
-    def guardar(self):
-        f = tkFileDialog.asksaveasfile(mode='w', defaultextension=".txt")
-        if f is None:  # asksaveasfile return `None` if dialog closed with "cancel".
-            return
-        print str(f).split(',')
-        #text2save = str(text.get(1.0, END))  # starts from `1.0`, not `0.0`
-        #f.write(text2save)
-        #f.close()  # `()` was missing.
-
-    def desviacion_tipica(self):
+    def suma(self):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
         num_column = len(csvarchivo.columns)
 
         for i in range(0, num_column):
-            result_deviation = self.calcular_desviacion_tipica(csvarchivo.as_matrix()[:, i])
-            cadena = str(u"Desviación Típica para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_deviation)
+            result_suma = self.calcular_suma(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Suma para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_suma)
             self.lista_concatenada.append(cadena)
 
+        self.counter += 1
+
         if self.first == True:
-            self.root2.quit()
+            self.root2.deiconify()
             self.root2.destroy()
+            self.root2.quit()
+            self.file_result_final = open('./results/results.txt', 'w')
+
 
         self.root2 = Toplevel(self.root)
 
         self.root2.title("Resultado #%s" % self.counter)
         icon = PhotoImage(file=r"./images/lararov_6.gif")
         self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
-        # self.root2.iconify()
+        #self.root2.iconify()
 
         self.root2.deiconify()
 
@@ -298,10 +297,83 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
+        self.file_result_final.write(quote)
+        self.file_result_final.close()
         T.see(END)
         # T.grab_set()
         T.config(state='disabled')
         self.root.mainloop()
+        #self.root2.destroy()
+
+
+    def calcular_suma(self, value_matrix):
+        return np.sum(value_matrix)
+
+
+    def desviacion_tipica(self):
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            result_deviation = self.calcular_desviacion_tipica(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Desviación Típica para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_deviation)
+            self.lista_concatenada.append(cadena)
+
+        self.counter += 1
+
+        if self.first == True:
+            self.root2.deiconify()
+            self.root2.destroy()
+            self.root2.quit()
+            self.file_result_final = open('./results/results.txt', 'w')
+
+
+        self.root2 = Toplevel(self.root)
+
+        self.root2.title("Resultado #%s" % self.counter)
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
+        self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
+        #self.root2.iconify()
+
+        self.root2.deiconify()
+
+        screen_width = self.root2.winfo_screenwidth()
+        screen_height = self.root2.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        self.root2.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(self.root2)
+        T = Text(self.root2, height=10, width=100)
+
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        self.file_result_final.write(quote)
+        self.file_result_final.close()
+        T.see(END)
+        # T.grab_set()
+        T.config(state='disabled')
+        self.root.mainloop()
+        #self.root2.destroy()
 
 
     def calcular_desviacion_tipica(self, value_matrix):
@@ -317,9 +389,13 @@ class PyApp():
             cadena = str(u"Varianza para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_variance)
             self.lista_concatenada.append(cadena)
 
+        self.counter += 1
+
         if self.first == True:
             self.root2.quit()
             self.root2.destroy()
+            self.file_result_final = open('./results/results.txt', 'w')
+
 
         self.root2 = Toplevel(self.root)
 
@@ -360,6 +436,8 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
+        self.file_result_final.write(quote)
+        self.file_result_final.close()
         T.see(END)
         # T.grab_set()
         T.config(state='disabled')
@@ -433,6 +511,7 @@ class PyApp():
         if self.first == True:
             self.root2.quit()
             self.root2.destroy()
+            self.file_result_final = open('./results/results.txt', 'w')
 
 
         self.root2 = Toplevel(self.root)
@@ -474,6 +553,8 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
+        self.file_result_final.write(quote)
+        self.file_result_final.close()
         T.see(END)
         #T.grab_set()
         T.config(state='disabled')
@@ -496,6 +577,7 @@ class PyApp():
 
         if self.first == True:
             self.root2.destroy()
+            self.file_result_final = open('./results/results.txt', 'w')
 
         self.root2 = Toplevel(self.root)
         self.root2.title("Resultado #%s" % self.counter)
@@ -532,6 +614,8 @@ class PyApp():
         self.num_column_before = self.num_column_before + num_column
         self.first = True
         T.insert(END, quote)
+        self.file_result_final.write(quote)
+        self.file_result_final.close()
         T.see(END)
         # T.grab_set()
         T.config(state='disabled')
@@ -543,9 +627,23 @@ class PyApp():
         return rango
 
 
+    def guardar(self):
+        file = tkFileDialog.asksaveasfile(mode='w', defaultextension=".txt")
+        if file is None:  # asksaveasfile return `None` if dialog closed with "cancel".
+            return
+        file_two =  str(file).split(',')[0]
+        file_two = str(file_two).replace("<open file '",'')
+        file_final = str(file_two).replace("'", '')
+        shutil.copy(self.NAME_FILE_SAVE, file_final)
+        # text2save = str(text.get(1.0, END))  # starts from `1.0`, not `0.0`
+        # f.write(text2save)
+        # f.close()  # `()` was missing.
+
+
     def importar_fichero_cvs(self):
-            try:
+            #try:
                 # Make a top-level instance and hide since it is ugly and big.
+                '''
                 self.root3 = Tkinter.Tk()
                 self.root3.withdraw()
 
@@ -558,18 +656,19 @@ class PyApp():
                 self.root3.deiconify()
                 self.root3.lift()
                 self.root3.focus_force()
-
+                '''
                 filenames = tkFileDialog.askopenfilenames(parent=self.root,filetypes=[("Archivos CSV",".csv")])  # Or some other dialog
                 filenames = str(filenames).replace("',)", "")
                 filenames = str(filenames).replace("('", "")
                 shutil.copy(filenames, self.NAME_FILE)
-                self.root3.destroy()
+
+                #self.root3.destroy()
                 # Get rid of the top-level instance once to make it actually invisible.
                 #self.root.destroy()
-            except:
+            #except:
                 #pass
                 #print "llegamos aqui Salimos"
-                self.root3.destroy()
+                #self.root3.destroy()
 
 
 if __name__ == "__main__":

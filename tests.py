@@ -59,6 +59,19 @@ class PyAppTest(TestCase):
         self.assertEqual(self.pyapp.calcular_desviacion_tipica(array), 3.2863353450309969)
         self.assertNotEqual(self.pyapp.calcular_desviacion_tipica(array), 9)
 
+    def test_calulcar_suma(self):
+        array = [40, 5, 80, 3]
+        self.assertEqual(self.pyapp.calcular_suma(array), 128)
+        self.assertNotEqual(self.pyapp.calcular_suma(array), 9)
+
+        array = [9, -8, 9, -8]
+        self.assertEqual(self.pyapp.calcular_suma(array), 2)
+        self.assertNotEqual(self.pyapp.calcular_suma(array), 9)
+
+        array = [2, 3, 6, 8, 11]
+        self.assertEqual(self.pyapp.calcular_suma(array), 30)
+        self.assertNotEqual(self.pyapp.calcular_suma(array), 9)
+
 
     def tearDown(self):
         del self.pyapp
