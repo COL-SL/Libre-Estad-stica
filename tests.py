@@ -72,6 +72,19 @@ class PyAppTest(TestCase):
         self.assertEqual(self.pyapp.calcular_suma(array), 30)
         self.assertNotEqual(self.pyapp.calcular_suma(array), 9)
 
+    def test_calulcar_minimo(self):
+        array = [40, 5, 80, 3]
+        self.assertEqual(self.pyapp.calcular_minimo(array), 3)
+        self.assertNotEqual(self.pyapp.calcular_minimo(array), 9)
+
+        array = [9, -8, 9, -8]
+        self.assertEqual(self.pyapp.calcular_minimo(array), -8)
+        self.assertNotEqual(self.pyapp.calcular_minimo(array), 9)
+
+        array = [2, 6, 6, 8, 2]
+        self.assertEqual(self.pyapp.calcular_minimo(array), 2)
+        self.assertNotEqual(self.pyapp.calcular_minimo(array), 9)
+
 
     def tearDown(self):
         del self.pyapp
