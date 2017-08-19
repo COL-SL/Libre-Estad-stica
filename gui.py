@@ -68,15 +68,16 @@ class PyApp():
 
 
             editmenu = Menu(menubar, tearoff=0)
-            editmenu.add_command(label="Undo", command=self.donothing)
+            #editmenu.add_command(label="Undo", command=self.donothing)
 
 
 
-            editmenu.add_separator()
+            #editmenu.add_separator()
 
             centralmenu = Menu(editmenu, tearoff=0)
             centralmenu.add_command(label=u"Media aritmética", command=self.media_aritmetica)
             centralmenu.add_command(label=u"Suma", command=self.suma)
+            centralmenu.add_command(label=u"Mediana", command=self.mediana)
 
             dipersionmenu = Menu(editmenu, tearoff=0)
             dipersionmenu.add_command(label=u"Varianza", command=self.varianza)
@@ -310,6 +311,75 @@ class PyApp():
     def calcular_minimo(self, value_matrix):
         return np.amin(value_matrix)
 
+    def mediana(self):
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            result_median = self.calcular_mediana(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Mediana para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_median)
+            self.lista_concatenada.append(cadena)
+
+        self.counter += 1
+
+        if self.first == True:
+            self.root2.deiconify()
+            self.root2.destroy()
+            self.root2.quit()
+            self.file_result_final = open('./results/results.txt', 'w')
+
+
+        self.root2 = Toplevel(self.root)
+
+        self.root2.title("Resultado #%s" % self.counter)
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
+        self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
+        #self.root2.iconify()
+
+        self.root2.deiconify()
+
+        screen_width = self.root2.winfo_screenwidth()
+        screen_height = self.root2.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        self.root2.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(self.root2)
+        T = Text(self.root2, height=10, width=100)
+
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        self.file_result_final.write(quote)
+        self.file_result_final.close()
+        T.see(END)
+        # T.grab_set()
+        T.config(state='disabled')
+        self.root.mainloop()
+        #self.root2.destroy()
+
+
+    def calcular_mediana(self, value_matrix):
+        return np.median(value_matrix)
+
 
     def suma(self):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
@@ -517,56 +587,6 @@ class PyApp():
 
     def calcular_varianza(self,value_matrix):
         return np.var(value_matrix)
-
-
-    def mediana(self, widget, data=None):
-        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
-        num_column = len(csvarchivo.columns)
-
-        for i in range(0, num_column):
-            result_median = self.calcular_mediana(csvarchivo.as_matrix()[:, i])
-            cadena = str(u"Mediana para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_median)
-            self.lista_concatenada.append(cadena)
-
-        root = Tk()
-        root.title("Resultado ")
-
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-
-        width = 600
-        height = 200
-
-        # calculate position x and y coordinates
-        x = (screen_width / 2) - (width / 2)
-        y = (screen_height / 2) - (height / 2)
-        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
-
-        S = Scrollbar(root)
-        T = Text(root, height=10, width=100)
-        S.pack(side=RIGHT, fill=Y)
-        T.pack(side=LEFT, fill=Y)
-        S.config(command=T.yview)
-        T.config(yscrollcommand=S.set)
-        quote = ''
-
-        for i in range(0, len(self.lista_concatenada)):
-            if i == self.num_column_before and self.first == True:
-                quote = quote + '\n'
-            quote = quote + self.lista_concatenada[i]
-            quote = quote + '\n'
-
-        self.num_column_before = self.num_column_before + num_column
-        self.first = True
-        T.insert(END, quote)
-        T.focus_set()
-        T.see(END)
-        T.config(state='disabled')
-        root.mainloop()
-
-
-    def calcular_mediana(self,value_matrix):
-        return float(np.median(value_matrix))
 
 
     def media_aritmetica(self):
