@@ -317,6 +317,7 @@ class PyApp():
 
         for i in range(0, num_column):
             result_median = self.calcular_mediana(csvarchivo.as_matrix()[:, i])
+            print csvarchivo.as_matrix()[:, i]
             cadena = str(u"Mediana para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_median)
             self.lista_concatenada.append(cadena)
 
