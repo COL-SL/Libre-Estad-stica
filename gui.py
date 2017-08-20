@@ -25,6 +25,7 @@ import pandas as pd
 import numpy as np
 import Tkinter as tk
 from Tkinter import *
+from scipy import stats
 import statistics as st
 from tkFileDialog import askopenfilename,asksaveasfile
 import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
@@ -78,6 +79,7 @@ class PyApp():
             centralmenu.add_command(label=u"Media aritmética", command=self.media_aritmetica)
             centralmenu.add_command(label=u"Suma", command=self.suma)
             centralmenu.add_command(label=u"Mediana", command=self.mediana)
+            centralmenu.add_command(label=u"Moda", command=self.moda)
 
             dipersionmenu = Menu(editmenu, tearoff=0)
             dipersionmenu.add_command(label=u"Varianza", command=self.varianza)
@@ -310,6 +312,80 @@ class PyApp():
 
     def calcular_minimo(self, value_matrix):
         return np.amin(value_matrix)
+
+    def moda(self):
+        csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')
+        num_column = len(csvarchivo.columns)
+
+        for i in range(0, num_column):
+            result_moda = self.calcular_moda(csvarchivo.as_matrix()[:, i])
+            cadena = str(u"Moda para ") + str(csvarchivo.columns[i]) + str(u' = ') + str(result_moda)
+            self.lista_concatenada.append(cadena)
+
+        self.counter += 1
+
+        if self.first == True:
+            self.root2.deiconify()
+            self.root2.destroy()
+            self.root2.quit()
+            self.file_result_final = open('./results/results.txt', 'w')
+
+
+        self.root2 = Toplevel(self.root)
+
+        self.root2.title("Resultado #%s" % self.counter)
+        icon = PhotoImage(file=r"./images/lararov_6.gif")
+        self.root2.tk.call('wm', 'iconphoto', self.root2._w, icon)
+        #self.root2.iconify()
+
+        self.root2.deiconify()
+
+        screen_width = self.root2.winfo_screenwidth()
+        screen_height = self.root2.winfo_screenheight()
+
+        width = 600
+        height = 200
+
+        # calculate position x and y coordinates
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        self.root2.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        S = Scrollbar(self.root2)
+        T = Text(self.root2, height=10, width=100)
+
+        S.pack(side=RIGHT, fill=Y)
+        T.pack(side=LEFT, fill=Y)
+        S.config(command=T.yview)
+        T.config(yscrollcommand=S.set)
+
+        quote = ''
+
+        for i in range(0, len(self.lista_concatenada)):
+            if i == self.num_column_before and self.first == True:
+                quote = quote + '\n'
+            quote = quote + self.lista_concatenada[i]
+            quote = quote + '\n'
+
+        self.num_column_before = self.num_column_before + num_column
+        self.first = True
+        T.insert(END, quote)
+        self.file_result_final.write(quote)
+        self.file_result_final.close()
+        T.see(END)
+        # T.grab_set()
+        T.config(state='disabled')
+        self.root.mainloop()
+        #self.root2.destroy()
+
+
+    def calcular_moda(self, value_matrix):
+        result_moda = stats.mode(value_matrix)[0]
+        result_moda = str(result_moda).replace("[", "")
+        result_moda = str(result_moda).replace("]", "")
+        result_moda = str(result_moda).replace(".", "")
+
+        return float(result_moda)
 
     def mediana(self):
         csvarchivo = pd.read_csv(self.NAME_FILE, encoding='utf-8')

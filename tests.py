@@ -101,6 +101,22 @@ class PyAppTest(TestCase):
         self.assertEqual(self.pyapp.calcular_mediana(array), 2005.5)
         self.assertNotEqual(self.pyapp.calcular_mediana(array), 9)
 
+    def test_calulcar_moda(self):
+        array = [2, 3, 4, 4, 5, 5, 5, 6, 6]
+        self.assertEqual(self.pyapp.calcular_moda(array), 5)
+        self.assertNotEqual(self.pyapp.calcular_moda(array), 9)
+
+        array = [7, 8, 9, 10, 11, 12]
+        self.assertEqual(self.pyapp.calcular_moda(array), 7)
+        self.assertNotEqual(self.pyapp.calcular_moda(array), 8)
+
+
+        array = [1996,  1997,  1998,  1999,  2000,  2001,  2002,  2003,  2004,  2005,
+                2006,  2007,  2008,  2009,  2010,  2011,  2012,  2013,  2014,  2015,
+                2016, 2017, 2017, 5, 5, 90]
+        self.assertEqual(self.pyapp.calcular_moda(array), 5)
+        self.assertNotEqual(self.pyapp.calcular_moda(array), 9)
+
 
     def tearDown(self):
         del self.pyapp
